@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import "./EventosPage.css";
 import MainContent from '../../components/MainContent/MainContent';
 import Container from '../../components/Container/Container';
 import Title from '../../components/Titulo/Titulo';
 import ImageIllustrator from '../../components/ImageIllustrator/ImageIllustrator';
+import api, { eventsResource } from "../../Services/Services";
+import Notification from "../../components/Notification/Notification";
 
 import eventoImage from '../../assets/images/evento.svg';
 import { Button, Input } from '../../components/FormComponents/FormComponents';
@@ -17,6 +19,24 @@ const EventosPage = () => {
     const [nome, setNome] = useState("");
     const [descricao, setDescricao] = useState("");
     const [eventos, setEventos] = useState([]);
+    const [notifyUser, setNotifyUser] = useState();
+    const [showSpinner, setShowSpinner] = useState(false);
+
+    useEffect(() => {
+        async function loadEvents() {
+            try {
+
+                const retorno = await api.get(eventsResource);
+                setEventos(retorno.data);
+                console.log(retorno.data);
+
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        loadEvents();
+    }, [])
 
 
     function handleUpdate() {
@@ -31,8 +51,34 @@ const EventosPage = () => {
         
     }
 
-    function handleDelete() {
-        
+    async function handleDelete(idElement) {
+        if (! window.confirm('Confirma exclusao?')) {
+            return;
+        }
+
+        setShowSpinner(true);
+
+        try {
+            const promise = await api.delete(`${eventsResource}/${idElement}`);
+
+            if (promise.status === 204) {
+      
+                setNotifyUser({
+                  titleNote: "Título não informado",
+                  textNote: "Mensagem não informada",
+                  imgIcon: "default",
+                  imgAlt: "Icone da ilustração",
+                  showMessage: true
+                
+                });
+
+            }
+
+            const buscaEventos = await api.get(eventsResource);
+            setEventos(buscaEventos.data);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
