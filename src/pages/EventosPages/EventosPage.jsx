@@ -5,11 +5,11 @@ import MainContent from '../../components/MainContent/MainContent';
 import Container from '../../components/Container/Container';
 import Title from '../../components/Titulo/Titulo';
 import ImageIllustrator from '../../components/ImageIllustrator/ImageIllustrator';
-import api, { eventsResource } from "../../Services/Services";
+import api, { eventsResource, eventsTypeResource } from "../../Services/Services";
 import Notification from "../../components/Notification/Notification";
 
 import eventoImage from '../../assets/images/evento.svg';
-import { Button, Input } from '../../components/FormComponents/FormComponents';
+import { Button, Input, Select } from '../../components/FormComponents/FormComponents';
 import TableTp from '../TipoEventosPage/TableTp/TableTp';
 import TableEv from './TableEv/TableEv';
 
@@ -21,34 +21,87 @@ const EventosPage = () => {
     const [eventos, setEventos] = useState([]);
     const [notifyUser, setNotifyUser] = useState();
     const [showSpinner, setShowSpinner] = useState(false);
+    const [tipoEventos, setTipoEventos] = useState([]);
+    const [frmData, setFrmData] = useState({
+        "dataEvento": "",
+        "nomeEvento": "",
+        "descricao": "",
+        "idTipoEvento": "",
+        "idInstituicao": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    });
+    const [idEvento, setIdEvento] = useState(null); 
+    const [frmEditData, setFrmEditData] = useState([])
+
+    async function loadEvents() {
+        try {
+
+            const retorno = await api.get(eventsResource);
+            setEventos(retorno.data);
+            console.log(retorno.data);
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     useEffect(() => {
-        async function loadEvents() {
+
+
+        async function loadTypeEvents() {
             try {
-
-                const retorno = await api.get(eventsResource);
-                setEventos(retorno.data);
+                const retorno = await api.get(eventsTypeResource);
+                setTipoEventos(retorno.data)
                 console.log(retorno.data);
-
             } catch (error) {
                 console.log(error);
             }
-        };
+        }
 
         loadEvents();
+        loadTypeEvents();
     }, [])
 
+    
 
-    function handleUpdate() {
-        
+
+    async function handleUpdate() {
+        e.preventDefault();
+
+        try {
+            const promise = await api.put(`${eventsResource}/${frmEditData.idEvento}`, 
+            {
+                nomeEvento: frmEditData.nomeEvento,
+                dataEvento: frmEditData.nomeEvento,
+                descricao: frmEditData.nomeEvento,
+                idInstituicao: frmEditData.nomeEvento,
+                idTipoEvento: frmEditData.nomeEvento,
+
+            })
+        } catch (error) {
+            
+        }
+
+        setFrmEditData({});
+        setFrmEdit(false);
+        return;
     }
 
-    function handleSubmit() {
-        
+    async function handleSubmit(e) {
+        e.preventDefault();
+        console.log(frmData);
+
+        try {
+            const promise = await api.post(eventsResource, frmData);
+
+            loadEvents();
+        } catch (error) {
+            
+        }
     }
 
-    function showUpdateForm() {
-        
+    async function showUpdateForm(evento) {
+        setFrmEditData(evento);
+        setFrmEdit(true);
     }
 
     async function handleDelete(idElement) {
@@ -108,7 +161,13 @@ const EventosPage = () => {
                                     name={"nome"}
                                     type={"text"}
                                     required={"required"}
-                                    value={nome}
+                                    value={frmData.nomeEvento}
+                                    manipulationFunction={(n) => {
+                                        setFrmData({
+                                            ...frmData,
+                                            nomeEvento: n.target.value
+                                        });
+                                    }}
                                     />
 
                                     <Input 
@@ -117,23 +176,44 @@ const EventosPage = () => {
                                     name={"descricao"}
                                     type={"text"}
                                     required={"required"}
-                                    value={descricao}
+                                    value={frmData.descricao}
+                                    manipulationFunction={(d) => {
+                                        setFrmData({
+                                            ...frmData,
+                                            descricao: d.target.value
+                                        });
+                                    }}
                                     />
 
-                                    <Input 
+                                    <Select 
                                     id="tipoEvento"
                                     placeholder="Tipo Evento"
                                     name={"tipoEvento"}
                                     type={"text"}
                                     required={"required"}
+                                    options={tipoEventos}
+                                    defaultValue={frmData.idTipoEvento}
+                                    manipulationFunction={(e) => {
+                                        setFrmData({
+                                            ...frmData,
+                                            idTipoEvento: e.target.value,
+                                        })
+                                    }}
                                     /> 
 
                                     <Input 
                                     id="data"
                                     placeholder="dd/mm/aaaa"
                                     name={"data"}
-                                    type={"data"}
+                                    type={"date"}
                                     required={"required"}
+                                    value={frmData.dataEvento}
+                                    manipulationFunction={(e) => {
+                                        setFrmData({
+                                            ...frmData,
+                                            dataEvento: e.target.value,
+                                        })
+                                    }}
                                     />
 
                                     <Button 
@@ -141,11 +221,94 @@ const EventosPage = () => {
                                     id={"cadastrar"}
                                     name={"cadastrar"}
                                     type="submit"
+
                                     />
                                 </>
                             ) : (
                                 //Editar
-                                <></>
+                                <>
+                                    <Input 
+                                    id="Nome"
+                                    placeholder="Nome"
+                                    name={"nome"}
+                                    type={"text"}
+                                    required={"required"}
+                                    value={frmEditData.nomeEvento}
+                                    manipulationFunction={(n) => {
+                                        setFrmEditData({
+                                            ...frmEditData,
+                                            nomeEvento: n.target.value
+                                        });
+                                    }}
+                                    />
+
+                                    <Input 
+                                    id="descricao"
+                                    placeholder="Descrição"
+                                    name={"descricao"}
+                                    type={"text"}
+                                    required={"required"}
+                                    value={frmEditData.descricao}
+                                    manipulationFunction={(d) => {
+                                        setFrmEditData({
+                                            ...frmEditData,
+                                            descricao: d.target.value
+                                        });
+                                    }}
+                                    />
+
+                                    <Select 
+                                    id="tipoEvento"
+                                    placeholder="Tipo Evento"
+                                    name={"tipoEvento"}
+                                    type={"text"}
+                                    required={"required"}
+                                    options={tipoEventos}
+                                    defaultValue={frmEditData.idTipoEvento}
+                                    manipulationFunction={(e) => {
+                                        setFrmEditData({
+                                            ...frmEditData,
+                                            idTipoEvento: e.target.value,
+                                        })
+                                    }}
+                                    /> 
+
+                                    <Input 
+                                    id="data"
+                                    placeholder="dd/mm/aaaa"
+                                    name={"data"}
+                                    type={"date"}
+                                    required={"required"}
+                                    value={new Date(frmEditData.dataEvento).toLocaleDateString("sv-SE")}
+                                    manipulationFunction={(e) => {
+                                        setFrmEditData({
+                                            ...frmEditData,
+                                            dataEvento: e.target.value,
+                                        })
+                                    }}
+                                    />
+
+                                    <Button 
+                                    textButton="Atualizar"
+                                    id={"cadastrar"}
+                                    name={"cadastrar"}
+                                    type="submit"
+
+
+
+                                    />
+
+                                    <Button
+                                    textButton="Cancelar"
+                                    id={"cancelar"}
+                                    name={"cancelar"}
+                                    type="button"
+                                    addicionalClass="button-component--middle"
+                                    manipulationFunction={() => {
+                                      setFrmEdit(false);
+                                    }}
+                                    />
+                                </>
                             )}
                         </form>
                     </div>

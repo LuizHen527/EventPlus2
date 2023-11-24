@@ -49,6 +49,17 @@ const TableEv = ({ dados, fnDelete = null, fnUpdate = null }) => {
                                 className="table-data__icon"
                                 src={edtiPen}
                                 alt="" 
+                                onClick={(e) => {
+                                    //Da pra passar o ev direto?
+                                    fnUpdate({
+                                        idEvento: ev.idEvento,
+                                        nomeEvento: ev.nomeEvento,
+                                        dataEvento: ev.dataEvento,
+                                        descricao: ev.descricao,
+                                        idInstituicao: ev.idInstituicao,
+                                        idTipoEvento: ev.idTipoEvento
+                                    })
+                                }}
                                 />
                             </td>
 
