@@ -27,7 +27,7 @@ const EventosPage = () => {
         "nomeEvento": "",
         "descricao": "",
         "idTipoEvento": "",
-        "idInstituicao": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        "idInstituicao": "22a2dfe6-ba24-4229-9489-d3c7a8cba57a"
     });
     const [idEvento, setIdEvento] = useState(null); 
     const [frmEditData, setFrmEditData] = useState([])
@@ -64,19 +64,24 @@ const EventosPage = () => {
     
 
 
-    async function handleUpdate() {
+    async function handleUpdate(e) {
         e.preventDefault();
 
         try {
             const promise = await api.put(`${eventsResource}/${frmEditData.idEvento}`, 
             {
                 nomeEvento: frmEditData.nomeEvento,
-                dataEvento: frmEditData.nomeEvento,
-                descricao: frmEditData.nomeEvento,
-                idInstituicao: frmEditData.nomeEvento,
-                idTipoEvento: frmEditData.nomeEvento,
+                dataEvento: frmEditData.dataEvento,
+                descricao: frmEditData.descricao,
+                idInstituicao: frmEditData.idInstituicao,
+                idTipoEvento: frmEditData.idTipoEvento,
 
-            })
+            });
+
+            if(promise.status === 204){
+                const buscaEventos = await api.get(eventsResource);
+                setEventos(buscaEventos.data);
+            }
         } catch (error) {
             
         }
