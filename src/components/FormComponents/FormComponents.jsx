@@ -47,9 +47,7 @@ export const Select = ({
     required,
     id,
     name,
-    options = [],
-    onChange,
-    className = "",
+    options,
     defaultValue,
     addicionalClass = "",
     manipulationFunction
@@ -58,7 +56,7 @@ export const Select = ({
         <select 
         name={name}
         id={id}
-        required={required}
+        required={required ? "required" : ""}
         className={`input-component ${addicionalClass}`}
         onChange={manipulationFunction}
         value={defaultValue}
@@ -67,7 +65,7 @@ export const Select = ({
             <option value={0}>Selecione</option>
             {options.map((o) => {
                 return(
-                    <option key={o.idTipoEvento} value={o.idTipoEvento}>{o.titulo}</option>
+                    <option key={o.value} value={o.value}>{o.text}</option>
                 );
             })}
 

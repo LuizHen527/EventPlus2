@@ -1,9 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ImageIllustrator from "../../components/ImageIllustrator/ImageIllustrator";
 import logo from "../../assets/images/logo-pink.svg";
 import { Input, Button } from "../../components/FormComponents/FormComponents";
 import loginImage from "../../assets/images/login.svg"
 import api, { loginResource } from "../../Services/Services";
+import { useNavigate } from "react-router-dom";
 
 
 import "./LoginPage.css";
@@ -14,6 +15,12 @@ const LoginPage = () => {
 
     const [user, setUser] = useState({email: "lcomum@gmail.com", senha: "1234567"});
     const {userData, setUserData} = useContext(UserContext);
+
+    const navigate = useNavigate();
+
+    useEffect( () =>{
+      if(userData.nome) navigate("/");
+  }, [userData]);
 
     async function handleSubmit(e) {
         e.preventDefault("Dados de login:");
@@ -32,6 +39,10 @@ const LoginPage = () => {
                 setUserData(userFullToken);
 
                 localStorage.setItem("token", JSON.stringify(userFullToken));
+
+                navigate('/');
+
+                console.log(userFullToken);
 
             } catch (error) {
                 alert("Cadastre corretamente");

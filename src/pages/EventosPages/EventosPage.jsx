@@ -50,8 +50,14 @@ const EventosPage = () => {
         async function loadTypeEvents() {
             try {
                 const retorno = await api.get(eventsTypeResource);
-                setTipoEventos(retorno.data)
-                console.log(retorno.data);
+
+                const dados = await (retorno.data.map(tipoEvento => {
+                    return { value: tipoEvento.idTipoEvento, text: tipoEvento.titulo }
+                }));
+
+                setTipoEventos(dados)
+                
+                //console.log(retorno.data);
             } catch (error) {
                 console.log(error);
             }

@@ -2,13 +2,18 @@ import logo from './logo.svg';
 import './App.css';
 import { UserContext } from './context/AuthContext';
 
-import Rotas from "./routes"
-import { useState } from 'react';
+import Rotas from "./routes/routes"
+import { useEffect, useState } from 'react';
 
 
 const App = () => {
 
     const [userData, setUserData] = useState({});
+
+    useEffect( () =>{
+        const token = localStorage.getItem("token");
+        setUserData(token === null ? {} : JSON.parse(token));
+    }, []);
 
     return (
         <UserContext.Provider value={{userData, setUserData}}>

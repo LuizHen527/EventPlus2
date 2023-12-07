@@ -7,10 +7,30 @@ import axios from 'axios';
 export const eventsResource = '/Evento';
 
 /**
+ * Rota para presencas evento
+ */
+
+export const presencesEventsResource = '/PresencasEvento';
+
+/**
+ * Rota para Comentarios do evento
+ */
+
+export const CommentsEventsResource = '/ComentariosEvento';
+
+/**
  * Rota para fazer login
  */
 
 export const loginResource = '/Login'
+
+/**
+ * Rota para fazer login
+ */
+
+export const myEventsResource = '/PresencasEvento/ListarMinhas'
+
+
 
 /**
  * Rota para o recurso Proximos Eventos
