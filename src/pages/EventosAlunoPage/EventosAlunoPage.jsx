@@ -29,6 +29,9 @@ const EventosAlunoPage = () => {
   const [tipoEvento, setTipoEvento] = useState("1"); //código do tipo do Evento escolhido
   const [showSpinner, setShowSpinner] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [comentario, setComentario] = useState("");
+  const [frmData, setFrmData] = useState({});
+  const [novoComentario, setNovoComentario] = useState("");
 
   // recupera os dados globais do usuário
   const { userData, setUserData } = useContext(UserContext);
@@ -36,10 +39,10 @@ const EventosAlunoPage = () => {
   useEffect(() => {
     setShowSpinner(true);
 
-    
+
 
     loadEventsType();
-  }, [tipoEvento]);
+  }, []);
 
   async function loadEventsType(){
     setShowSpinner(true);
@@ -114,21 +117,39 @@ const EventosAlunoPage = () => {
     return arrAllEvents;
   };
 
-  async function loadMyCommentary() {
-    return "Ler um comentario";
+  const loadMyCommentary = async () => {
+    try {
+      const promise = await api.get(`${CommentsEventsResource}/BuscarPorIdUsuario?idUsuario=${userData.userId}&idEvento=${userData.idEvento}`);
+
+      console.log('Comentario:');
+      setComentario(promise.data.descricao);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   async function postMyCommentary () {
     alert('Postar')
     try {
-      const promise = await api.post(CommentsEventsResource, )
+      const promise = await api.post(CommentsEventsResource, {
+        descricao: novoComentario.descricao,
+        exibe: true,
+        idUsuario: userData.userId,
+        idEvento: userData.idEvento
+      });
+
+      setNovoComentario("");
+      console.log('Dados cadastrados');
+      console.log(promise.status);
     } catch (error) {
-      
+      console.log(error);
     }
   };
 
-  const showHideModal = () => {
+  const showHideModal = (idEvent) => {
     setShowModal(showModal ? false : true);
+    setUserData({...userData, idEvento: idEvent});
+    console.log(idEvent);
   };
 
   const commentaryRemove = () => {
@@ -149,7 +170,7 @@ const EventosAlunoPage = () => {
           alert("Presenca confirmada, parabens")
         }
       } catch (error) {
-        
+        console.log(error);
       }
       alert("CONECTAR AO EVENTO:" + eventId);
       return;
@@ -203,9 +224,7 @@ const EventosAlunoPage = () => {
           <Table
             dados={eventos}
             fnConnect={handleConnect}
-            fnShowModal={() => {
-              showHideModal();
-            }}
+            fnShowModal={showHideModal}
           />
         </Container>
       </MainContent>
@@ -220,6 +239,9 @@ const EventosAlunoPage = () => {
           fnGet={loadMyCommentary}
           fnPost={postMyCommentary}
           fnDelete={commentaryRemove}
+          comentaryText={comentario}
+          novoComentario={novoComentario}
+          setNovoComentario={setNovoComentario}
         />
       ) : null}
     </>

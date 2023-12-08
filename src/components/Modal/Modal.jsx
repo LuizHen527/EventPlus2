@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import trashDelete from "../../assets/images/trash-delete-red.png";
+import { UserContext } from "../../context/AuthContext";
 
 import { Button, Input } from "../FormComponents/FormComponents";
 import "./Modal.css";
@@ -7,14 +8,30 @@ import "./Modal.css";
 const Modal = ({
   modalTitle = "Feedback",
   comentaryText = "Não informado. Não informado. Não informado.",
-  userId = null,
+  //userId = null,
   showHideModal,
   fnDelete = null,
   fnGet = null,
   fnPost = null,
-  fnNewCommentary = null
+  fnNewCommentary = null,
+  novoComentario = null,
+  setNovoComentario = null
 
 }) => {
+
+  const {userData} = useContext(UserContext);
+  //console.clear();
+  console.log(userData);
+
+  useEffect(() => {
+    async function pegarDados()
+    {
+      await fnGet();
+    }
+
+    pegarDados();
+    
+  }, [novoComentario])
 
   return (
     <div className="modal">
@@ -42,12 +59,18 @@ const Modal = ({
         <Input
           placeholder="Escreva seu comentário..."
           className="comentary__entry"
+          value={novoComentario.descricao}
+          manipulationFunction={(n) => {
+            setNovoComentario({
+                descricao: n.target.value
+            });
+          }}
         />
 
         <Button
           textButton="Comentar"
           className="comentary__button"
-          manipulationFunction={() => {fnPost()}}
+          manipulationFunction={(c) => {fnPost()}}
         />
       </article>
     </div>
